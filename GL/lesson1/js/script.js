@@ -1,19 +1,18 @@
 /**
  * Created by ivan.datsiv on 9/6/2016.
  */
+
 var User = React.createClass({
     getInitialState: function () {
         return {};
     },
-
     componentDidMount: function () {
         var component = this;
+        $.get("http://swapi.co/api/people/" + this.props.localCounter, function (data) {
+            component.setState(data);
+        });
 
-        if (this.state != null) {
-            $.get("http://swapi.co/api/people/" + this.props.localCounter, function (data) {
-                component.setState(data);
-            });
-        }
+        console.log("component: ", component.state.name);
     },
 
     componentWillReceiveProps: function (nextProps) {
@@ -25,7 +24,6 @@ var User = React.createClass({
     },
 
     render: function () {
-
         return (
             <div>
                 <h3>{this.props.localCounter}</h3>
@@ -38,7 +36,6 @@ var User = React.createClass({
 
                 <div><Film secondlocalCounter={this.props.localCounter} localFilms={this.state.films}/></div>
             </div>
-
         )
     }
 });
@@ -47,17 +44,20 @@ var Film = React.createClass({
         getInitialState: function () {
             return {};
         },
-
         render: function () {
-            var filmsName = [];
-            console.log(this.props.localFilms);
-            $.makeArray(this.props.localFilms).forEach(function (e, i) {
-                console.log(e);
+            if (this.props.localFilms) {
+                var filmsName = [];
 
-                $.get(e, function (data) {
+                console.log("1: ", this.props.localFilms);
 
+                this.props.localFilms.forEach(function (e, i) {
+                    $.get(e, function (data) {
+                        filmsName.push(data.title);
+                    });
                 });
-            });
+                console.log("2: ", filmsName);
+            }
+            console.log("3: ", filmsName);
 
             return (
                 <div>
@@ -69,37 +69,29 @@ var Film = React.createClass({
     })
     ;
 
-var ButtonPre = React.createClass({
+var Button = React.createClass({
+    localHandleClick: function() {
+        this.props.localHandleClick(this.props.increment);
+    },
     render: function () {
         return (
-            <button onClick={this.props.localHandleClickPre}>Pre</button>
-        )
-    }
-});
-
-var ButtonNext = React.createClass({
-    render: function () {
-        return (
-            <button onClick={this.props.localHandleClickNext}>Next</button>
+            <button onClick={this.localHandleClick}>{this.props.localbuttonName}</button>
         )
     }
 });
 
 var Main = React.createClass({
     getInitialState: function () {
-        return {
-            counter: 1
-        };
+        return {counter: 1};
     },
 
-    handleClickPre: function () {
-        if (this.state.counter > 1) {
-            this.setState({counter: this.state.counter - 1});
+    handleClick: function (increment) {
+        console.log(increment);
+        if ((this.state.counter > 1) && (increment === -1)) {
+            this.setState({counter: this.state.counter + parseInt(increment)});
+        } else if (increment === 1) {
+            this.setState({counter: this.state.counter + parseInt(increment)});
         }
-    },
-
-    handleClickNext: function () {
-        this.setState({counter: this.state.counter + 1});
     },
 
     render: function () {
@@ -107,8 +99,8 @@ var Main = React.createClass({
             <div>
                 <User localCounter={this.state.counter}/>
 
-                <ButtonPre localHandleClickPre={this.handleClickPre}/>
-                <ButtonNext localHandleClickNext={this.handleClickNext}/>
+                <Button localHandleClick={this.handleClick} increment={-1} localbuttonName={"Pre"}/>
+                <Button localHandleClick={this.handleClick} increment={1} localbuttonName={"Next"}/>
             </div>
         )
     }
