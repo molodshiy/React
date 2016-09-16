@@ -6,24 +6,31 @@ var User = React.createClass({
     getInitialState: function () {
         return {};
     },
+
     componentDidMount: function () {
         var component = this;
         $.get("http://swapi.co/api/people/" + this.props.localCounter, function (data) {
             component.setState(data);
         });
-
-        console.log("component: ", component.state.name);
     },
 
     componentWillReceiveProps: function (nextProps) {
         var component = this;
         $.get("http://swapi.co/api/people/" + nextProps.localCounter, function (data) {
             component.setState(data);
-
         });
     },
 
     render: function () {
+
+        var filmsName = [];
+        var data = this.state.films;
+        if (data !== undefined) {
+            data.map(function (e, i) {
+                filmsName.push(<Films key={i} data1={e}/>);
+            });
+        }
+
         return (
             <div>
                 <h3>{this.props.localCounter}</h3>
@@ -34,43 +41,35 @@ var User = React.createClass({
 
                 <h3>{this.state.mass}</h3>
 
-                <div><Film secondlocalCounter={this.props.localCounter} localFilms={this.state.films}/></div>
+                <ul>
+                    {filmsName}
+                </ul>
             </div>
         )
     }
 });
 
-var Film = React.createClass({
-        getInitialState: function () {
-            return {};
-        },
-        render: function () {
-            if (this.props.localFilms) {
-                var filmsName = [];
+var Films = React.createClass({
 
-                console.log("1: ", this.props.localFilms);
+    getInitialState: function () {
+        return {};
+    },
+    componentDidMount: function () {
+        var component = this;
+        $.get(this.props.data1, function (data) {
+            component.setState(data);
+        });
+    },
 
-                this.props.localFilms.forEach(function (e, i) {
-                    $.get(e, function (data) {
-                        filmsName.push(data.title);
-                    });
-                });
-                console.log("2: ", filmsName);
-            }
-            console.log("3: ", filmsName);
-
-            return (
-                <div>
-                    <div>Films: {filmsName}</div>
-                    <div>{this.props.localFilms}</div>
-                </div>
-            )
-        }
-    })
-    ;
+    render: function () {
+        return (
+            <li>{this.state.title}</li>
+        )
+    }
+});
 
 var Button = React.createClass({
-    localHandleClick: function() {
+    localHandleClick: function () {
         this.props.localHandleClick(this.props.increment);
     },
     render: function () {
