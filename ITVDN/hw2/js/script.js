@@ -4,6 +4,7 @@
 
 var Note = React.createClass({
     render: function () {
+
         var style = {backgroundColor: this.props.color};
         return (
             <div className="note" style={style}>
@@ -16,19 +17,60 @@ var Note = React.createClass({
 
 var Color = React.createClass({
 
+    localHandleClick: function () {
+        this.props.localHandleClick(this.props.inColor);
+    },
+
     render: function () {
         return (
-            <div onClick={this.props.onClick}></div>
+            <div onClick={this.localHandleClick}>{this.props.activeColor}</div>
         )
     }
 });
 
+var Colors = React.createClass({
+        getInitialState: function () {
+            return {
+                activeColor: ['+', '', '', '', ''],
+                colorList: ["#d53eff", "#347fff", "#55ff58", "#ff5891", "#d69552"]
+            }
+        },
+
+        componentWillUpdate: function () {
+            var color = this.props.color;
+            var activeColor = this.state.activeColor;
+            this.state.colorList.forEach(function (e, i) {
+                activeColor[i] = '';
+                if (e === color) {
+                    activeColor[i] = '+';
+                }
+            });
+        },
+
+        render: function () {
+            return (
+                <div className="colors">
+                    <Color localHandleClick={this.props.localHandleClick} inColor={this.state.colorList[0]}
+                           activeColor={this.state.activeColor[0]}></Color>
+                    <Color localHandleClick={this.props.localHandleClick} inColor={this.state.colorList[1]}
+                           activeColor={this.state.activeColor[1]}></Color>
+                    <Color localHandleClick={this.props.localHandleClick} inColor={this.state.colorList[2]}
+                           activeColor={this.state.activeColor[2]}></Color>
+                    <Color localHandleClick={this.props.localHandleClick} inColor={this.state.colorList[3]}
+                           activeColor={this.state.activeColor[3]}></Color>
+                    <Color localHandleClick={this.props.localHandleClick} inColor={this.state.colorList[4]}
+                           activeColor={this.state.activeColor[4]}></Color>
+                </div>
+            )
+        }
+    })
+    ;
 
 var NoteEditor = React.createClass({
     getInitialState: function () {
         return {
             text: '',
-            color: '#d53eff'
+            color: '#d53eff',
         }
     },
 
@@ -36,20 +78,8 @@ var NoteEditor = React.createClass({
         this.setState({text: event.target.value});
     },
 
-    handleNoteColor1: function () {
-        this.setState({color: '#d53eff'});
-    },
-    handleNoteColor2: function () {
-        this.setState({color: '#347fff'});
-    },
-    handleNoteColor3: function () {
-        this.setState({color: '#55ff58'});
-    },
-    handleNoteColor4: function () {
-        this.setState({color: '#ff5891'});
-    },
-    handleNoteColor5: function () {
-        this.setState({color: '#d69552'});
+    handleNoteColor: function (inColor) {
+        this.setState({color: inColor});
     },
 
     handleNoteAdd: function () {
@@ -63,6 +93,7 @@ var NoteEditor = React.createClass({
         this.setState({text: ''});
     },
 
+
     render: function () {
         return (
             <div className="note-editor">
@@ -73,13 +104,8 @@ var NoteEditor = React.createClass({
                     value={this.state.text}
                     onChange={this.handleTextChange}/>
 
-                <div className="colors">
-                    <Color onClick={this.handleNoteColor1}/>
-                    <Color onClick={this.handleNoteColor2}/>
-                    <Color onClick={this.handleNoteColor3}/>
-                    <Color onClick={this.handleNoteColor4}/>
-                    <Color onClick={this.handleNoteColor5}/>
-                </div>
+                <Colors localHandleClick={this.handleNoteColor} color={this.state.color}/>
+
                 <button className="add-button" onClick={this.handleNoteAdd}>Add</button>
             </div>
         )
@@ -108,6 +134,7 @@ var NotesGrid = React.createClass({
     render: function () {
         var onNoteDelete = this.props.onNoteDelete;
         return (
+
             <div className="notes-grid" ref="grid">
                 {
                     this.props.notes.map(function (note) {
