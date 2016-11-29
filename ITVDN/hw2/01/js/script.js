@@ -36,13 +36,13 @@ var Colors = React.createClass({
             }
         },
 
-        componentWillUpdate: function () {
-            var color = this.props.color;
+        componentWillUpdate: function (nextProps) {
+            var amp = String.fromCharCode(10003);
             var activeColor = this.state.activeColor;
             this.state.colorList.forEach(function (e, i) {
                 activeColor[i] = '';
-                if (e === color) {
-                    activeColor[i] = '+';
+                if (e === nextProps.color) {
+                    activeColor[i] = amp;
                 }
             });
         },

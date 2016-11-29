@@ -91,11 +91,13 @@ body {
 }
 
 .colors > div {
-    display: inline-block;
+    float: left;
     margin: 5px;
     width: 30px;
     height: 30px;
     border-radius: 15px;
+    line-height: 30px;
+    text-align: center;
 }
 
 .colors > div:nth-child(1) {
