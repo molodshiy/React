@@ -1,10 +1,9 @@
 /**
- * Created by ivan.datsiv on 11/15/2016.
+ * Created by ivan.datsiv on 11/24/2016.
  */
 
 var Note = React.createClass({
     render: function () {
-
         var style = {backgroundColor: this.props.color};
         return (
             <div className="note" style={style}>
@@ -17,62 +16,47 @@ var Note = React.createClass({
 
 var Color = React.createClass({
 
-    localHandleClick: function () {
-        this.props.localHandleClick(this.props.inColor);
-    },
-
     render: function () {
         return (
-            <div onClick={this.localHandleClick}>{this.props.activeColor}</div>
+            <div onClick={this.props.localHandleClick}>+</div>
         )
     }
 });
 
 var Colors = React.createClass({
-        getInitialState: function () {
-            var amp = String.fromCharCode(10003);
-            return {
-                activeColor: [amp, '', '', '', ''],
-                colorList: ["#d53eff", "#347fff", "#55ff58", "#ff5891", "#d69552"]
-            }
-        },
-
-
-        componentWillUpdate: function (nextProps) {
-            var amp = String.fromCharCode(10003);
-            var activeColor = this.state.activeColor;
-            this.state.colorList.forEach(function (e, i) {
-                activeColor[i] = '';
-                if (e === nextProps.color) {
-                    activeColor[i] = amp;
-                }
-            });
-        },
-
-        render: function () {
-            return (
-                <div className="colors">
-                    <Color localHandleClick={this.props.localHandleClick} inColor={this.state.colorList[0]}
-                           activeColor={this.state.activeColor[0]}></Color>
-                    <Color localHandleClick={this.props.localHandleClick} inColor={this.state.colorList[1]}
-                           activeColor={this.state.activeColor[1]}></Color>
-                    <Color localHandleClick={this.props.localHandleClick} inColor={this.state.colorList[2]}
-                           activeColor={this.state.activeColor[2]}></Color>
-                    <Color localHandleClick={this.props.localHandleClick} inColor={this.state.colorList[3]}
-                           activeColor={this.state.activeColor[3]}></Color>
-                    <Color localHandleClick={this.props.localHandleClick} inColor={this.state.colorList[4]}
-                           activeColor={this.state.activeColor[4]}></Color>
-                </div>
-            )
+    getInitialState: function () {
+        return {
+            activeColor: 1,
+            ColorList: ["#d53eff", "#347fff", "#55ff58", "#ff5891", "#d69552"]
         }
-    })
-    ;
+    },
+
+    render: function () {
+        var localHandleClick = this.props.localHandleClick;
+
+        return (
+            <div className="colors">
+                {
+                    this.state.ColorList.forEach(function (e) {
+                        return (
+                            <Color
+                                localHandleClick={localHandleClick.bind(null, e)}>
+                            </Color>
+                        );
+                    })
+                }
+
+            </div>
+        )
+    }
+
+});
 
 var NoteEditor = React.createClass({
     getInitialState: function () {
         return {
             text: '',
-            color: '#d53eff',
+            color: '#d53eff'
         }
     },
 
@@ -106,7 +90,7 @@ var NoteEditor = React.createClass({
                     value={this.state.text}
                     onChange={this.handleTextChange}/>
 
-                <Colors localHandleClick={this.handleNoteColor} color={this.state.color}/>
+                <Colors localHandleClick={this.handleNoteColor}/>
 
                 <button className="add-button" onClick={this.handleNoteAdd}>Add</button>
             </div>
@@ -135,6 +119,9 @@ var NotesGrid = React.createClass({
 
     render: function () {
         var onNoteDelete = this.props.onNoteDelete;
+        {
+            console.log(this)
+        }
         return (
 
             <div className="notes-grid" ref="grid">
@@ -154,29 +141,16 @@ var NotesGrid = React.createClass({
     }
 });
 
-var Search = React.createClass({
-    localhandleSearch: function (event) {
-        this.props.localhandleSearch(event);
-    },
-
-    render: function () {
-        return (
-            <input className="search" placeholder="search..." onChange={this.localhandleSearch}/>
-        )
-    }
-});
-
 var NotesApp = React.createClass({
     getInitialState: function () {
         return {
-            notes: [],
-            showNotes: []
+            notes: []
         }
     },
     componentDidMount: function () {
         var localNotes = JSON.parse(localStorage.getItem('notes'));
         if (localNotes) {
-            this.setState({notes: localNotes, showNotes: localNotes});
+            this.setState({notes: localNotes});
         }
     },
 
@@ -186,43 +160,23 @@ var NotesApp = React.createClass({
 
     handleNoteDelete: function (note) {
         var noteId = note.id;
-        console.log(note.id);
         var newNotes = this.state.notes.filter(function (note) {
             return note.id !== noteId;
         });
-
-        var newShowNotes = this.state.showNotes.filter(function (note) {
-            return note.id !== noteId;
-        });
-
-        this.setState({notes: newNotes, showNotes: newShowNotes});
+        this.setState({notes: newNotes});
     },
 
     handleNoteAdd: function (newNote) {
         var newNotes = this.state.notes.slice();
-        var showNotes = this.state.showNotes.slice();
         newNotes.unshift(newNote);
-        showNotes.unshift(newNote);
-        this.setState({notes: newNotes, showNotes: showNotes});
-    },
-
-    handleSearch: function (event) {
-        var searchValue = event.target.value.toLowerCase();
-        var sortNotes = this.state.notes.filter(function(el){
-            var ell = el.text.toLowerCase();
-            return ell.indexOf(searchValue) !== -1;
-        });
-        this.setState({
-            showNotes: sortNotes
-        })
+        this.setState({notes: newNotes});
     },
 
     render: function () {
         return (
             <div className="notes-app">
-                <Search notes={this.state.notes} localhandleSearch={this.handleSearch}/>
                 <NoteEditor onNoteAdd={this.handleNoteAdd}/>
-                <NotesGrid notes={this.state.showNotes} onNoteDelete={this.handleNoteDelete}/>
+                <NotesGrid notes={this.state.notes} onNoteDelete={this.handleNoteDelete}/>
             </div>
         )
     },

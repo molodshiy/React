@@ -103,15 +103,19 @@ body {
 .colors > div:nth-child(1) {
     background-color: #d53eff;
 }
+
 .colors > div:nth-child(2) {
     background-color: #347fff;
 }
+
 .colors > div:nth-child(3) {
     background-color: #55ff58;
 }
+
 .colors > div:nth-child(4) {
     background-color: #ff5891;
 }
+
 .colors > div:nth-child(5) {
     background-color: #d69552;
 }
@@ -158,6 +162,17 @@ body {
 .notes-app {
     max-width: 960px;
     width: 100%;
+}
+
+.search {
+    display: block;
+    margin: 0 auto;
+    padding-left: 10px;
+    width: 240px;
+    height: 40px;
+    border-radius: 10px;
+    border: 2px solid #456a7c;
+    outline: none;
 }
 
 .app-header {
